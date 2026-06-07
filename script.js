@@ -1,4 +1,4 @@
-const PRODUCT_PRICE = 20;
+const PRODUCT_PRICE = 18;
 
 const purchaseRadios = document.querySelectorAll('input[name="purchase-type"]');
 const giftSection = document.getElementById('gift-section');

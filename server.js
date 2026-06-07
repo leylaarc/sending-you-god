@@ -88,7 +88,7 @@ app.post('/create-checkout-session', async (req, res) => {
               : 'Handcrafted eco-wood cross · 2.36" × 1.34"',
             images: [`${BASE_URL}/images/cross.png`],
           },
-          unit_amount: 2000,
+          unit_amount: 1800,
         },
         quantity: 1,
       },
