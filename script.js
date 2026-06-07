@@ -1,14 +1,11 @@
-const PRODUCT_PRICE = 18;
-const SELF_SHIPPING = 4;
-const GIFT_SHIPPING = 0;
+const PRODUCT_PRICE = 20;
 
 const purchaseRadios = document.querySelectorAll('input[name="purchase-type"]');
 const giftSection = document.getElementById('gift-section');
 const selfSection = document.getElementById('self-section');
-const selfContact = document.getElementById('self-contact');
-const shippingDisplay = document.getElementById('shipping-display');
 const totalDisplay = document.getElementById('total-display');
 const btnTotal = document.getElementById('btn-total');
+const stickyTotal = document.getElementById('sticky-total');
 const giftMessage = document.getElementById('gift-message');
 const charCount = document.getElementById('char-count');
 const orderForm = document.getElementById('order-form');
@@ -18,6 +15,9 @@ const toast = document.getElementById('toast');
 const navToggle = document.querySelector('.nav-toggle');
 const navLinks = document.getElementById('nav-links');
 const header = document.querySelector('.site-header');
+const stickyBuy = document.getElementById('sticky-buy');
+const shopSection = document.getElementById('shop');
+const shopImageMain = document.getElementById('shop-image-main');
 
 function formatPrice(amount) {
   return `$${amount.toFixed(2)}`;
@@ -29,29 +29,31 @@ function getPurchaseType() {
 }
 
 function updatePricing() {
-  const isGift = getPurchaseType() === 'gift';
-  const shipping = isGift ? GIFT_SHIPPING : SELF_SHIPPING;
-  const total = PRODUCT_PRICE + shipping;
-
-  shippingDisplay.textContent = shipping === 0 ? 'Complimentary' : formatPrice(shipping);
-  totalDisplay.textContent = formatPrice(total);
-  btnTotal.textContent = formatPrice(total);
+  const total = formatPrice(PRODUCT_PRICE);
+  if (totalDisplay) totalDisplay.textContent = total;
+  if (btnTotal) btnTotal.textContent = total;
+  if (stickyTotal) stickyTotal.textContent = total;
 }
 
 function updateFormSections() {
   const isGift = getPurchaseType() === 'gift';
 
-  giftSection.hidden = !isGift;
-  selfSection.hidden = isGift;
-  selfContact.hidden = !isGift;
+  if (giftSection) giftSection.hidden = !isGift;
+  if (selfSection) selfSection.hidden = isGift;
 
-  document.getElementById('customer-name').required = !isGift;
-  document.getElementById('customer-email').required = !isGift;
-  document.getElementById('customer-address').required = !isGift;
+  const customerName = document.getElementById('customer-name');
+  const customerEmail = document.getElementById('customer-email');
+  const customerAddress = document.getElementById('customer-address');
+  const recipientName = document.getElementById('recipient-name');
+  const recipientAddress = document.getElementById('recipient-address');
+  const giftSenderEmail = document.getElementById('gift-sender-email');
 
-  document.getElementById('recipient-name').required = isGift;
-  document.getElementById('recipient-address').required = isGift;
-  document.getElementById('gift-sender-email').required = isGift;
+  if (customerName) customerName.required = !isGift;
+  if (customerEmail) customerEmail.required = !isGift;
+  if (customerAddress) customerAddress.required = !isGift;
+  if (recipientName) recipientName.required = isGift;
+  if (recipientAddress) recipientAddress.required = isGift;
+  if (giftSenderEmail) giftSenderEmail.required = isGift;
 
   updatePricing();
 }
@@ -79,6 +81,7 @@ function clearCheckoutError() {
     checkoutError.hidden = true;
   }
 }
+
 function showToast(message) {
   toast.textContent = message;
   toast.hidden = false;
@@ -104,6 +107,34 @@ function getFormData() {
     senderName: document.getElementById('sender-name').value.trim(),
     giftSenderEmail: document.getElementById('gift-sender-email').value.trim(),
   };
+}
+
+function initGallery() {
+  document.querySelectorAll('.shop-thumb').forEach((thumb) => {
+    thumb.addEventListener('click', () => {
+      const src = thumb.dataset.src;
+      if (!src || !shopImageMain) return;
+
+      shopImageMain.src = src;
+      document.querySelectorAll('.shop-thumb').forEach((t) => t.classList.remove('is-active'));
+      thumb.classList.add('is-active');
+    });
+  });
+}
+
+function initStickyBuy() {
+  if (!stickyBuy || !shopSection) return;
+
+  stickyBuy.hidden = false;
+
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      stickyBuy.classList.toggle('is-visible', !entry.isIntersecting);
+    },
+    { threshold: 0, rootMargin: '0px 0px -80px 0px' }
+  );
+
+  observer.observe(shopSection);
 }
 
 purchaseRadios.forEach((radio) => {
@@ -205,6 +236,9 @@ const revealObserver = new IntersectionObserver(
 document.querySelectorAll('.reveal').forEach((el) => {
   revealObserver.observe(el);
 });
+
+initGallery();
+initStickyBuy();
 
 if (orderForm) {
   updateFormSections();

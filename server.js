@@ -88,22 +88,11 @@ app.post('/create-checkout-session', async (req, res) => {
               : 'Handcrafted eco-wood cross · 2.36" × 1.34"',
             images: [`${BASE_URL}/images/cross.png`],
           },
-          unit_amount: 1800,
+          unit_amount: 2000,
         },
         quantity: 1,
       },
     ];
-
-    if (!isGift) {
-      lineItems.push({
-        price_data: {
-          currency: 'usd',
-          product_data: { name: 'Shipping' },
-          unit_amount: 400,
-        },
-        quantity: 1,
-      });
-    }
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
